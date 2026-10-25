@@ -1,0 +1,39 @@
+# CorvusAPI - CorvusSoftware
+# Copyright (C) 2026 CorvusSoftware
+# SPDX-License-Identifier: MIT
+
+name: CorvusAPI CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  header:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check copyright and SPDX headers
+        shell: bash
+        run: |
+          test "$(sed -n '1p' include/corvus/api.h)" = '// CorvusAPI - CorvusSoftware'
+          test "$(sed -n '2p' include/corvus/api.h)" = '// Copyright (C) 2026 CorvusSoftware'
+          test "$(sed -n '3p' include/corvus/api.h)" = '// SPDX-License-Identifier: MIT'
+          test "$(sed -n '1p' CMakeLists.txt)" = '# CorvusAPI - CorvusSoftware'
+          test "$(sed -n '3p' CMakeLists.txt)" = '# SPDX-License-Identifier: MIT'
+      - name: Validate C11 header
+        run: |
+          printf '#include <corvus/api.h>\n' | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
+      - name: Validate C++20 header
+        run: |
+          printf '#include <corvus/api.h>\n' | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
+      - name: Configure CMake interface
+        run: |
+          cmake -S . -B build
+          cmake --build build

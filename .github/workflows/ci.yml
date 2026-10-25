@@ -35,5 +35,5 @@ jobs:
           printf '#include <corvus/api.h>\n' | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
       - name: Configure CMake interface
         run: |
-          cmake -S . -B build
+          cmake -S . -B build -DCORVUSAPI_BUILD_VERIFIER=ON
           cmake --build build

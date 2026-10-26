@@ -22,17 +22,19 @@ jobs:
       - name: Check copyright and SPDX headers
         shell: bash
         run: |
-          test "$(sed -n '1p' include/corvus/api.h)" = '// CorvusAPI - CorvusSoftware'
-          test "$(sed -n '2p' include/corvus/api.h)" = '// Copyright (C) 2026 CorvusSoftware'
-          test "$(sed -n '3p' include/corvus/api.h)" = '// SPDX-License-Identifier: MIT'
+          for header in include/corvus/*.h; do
+            test "$(sed -n '1p' "$header")" = '// CorvusAPI - CorvusSoftware'
+            test "$(sed -n '2p' "$header")" = '// Copyright (C) 2026 CorvusSoftware'
+            test "$(sed -n '3p' "$header")" = '// SPDX-License-Identifier: MIT'
+          done
           test "$(sed -n '1p' CMakeLists.txt)" = '# CorvusAPI - CorvusSoftware'
           test "$(sed -n '3p' CMakeLists.txt)" = '# SPDX-License-Identifier: MIT'
       - name: Validate C11 header
         run: |
-          printf '#include <corvus/api.h>\n' | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
+          printf '#include <corvus/api.h>\n#include <corvus/achievements.h>\n' | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
       - name: Validate C++20 header
         run: |
-          printf '#include <corvus/api.h>\n' | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
+          printf '#include <corvus/api.h>\n#include <corvus/achievements.h>\n' | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
       - name: Configure CMake interface
         run: |
           cmake -S . -B build -DCORVUSAPI_BUILD_VERIFIER=ON

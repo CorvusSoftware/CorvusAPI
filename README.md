@@ -47,3 +47,12 @@ mention `CorvusAPI - CorvusSoftware` et un identifiant
 La licence d'un coeur tiers reste choisie par ses auteurs ; chaque
 distribution doit respecter egalement les licences de ses dependances
 et celles du frontend utilise.
+
+## Extension mémoire RetroAchievements
+
+Le contrat optionnel [`corvus/achievements.h`](include/corvus/achievements.h)
+expose des lectures synchrones et sans effet de bord dans l'espace mémoire de
+RetroAchievements. Il utilise le même handle que l'API de base et un symbole
+indépendant, `corvus_get_achievements_api`. L'ABI0 reste inchangée ; un module
+sans cette extension continue de fonctionner sans les succès.
+Voir [le contrat et les espaces d'adresses](docs/ACHIEVEMENTS.md).

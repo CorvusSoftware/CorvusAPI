@@ -18,7 +18,7 @@ Après :
 
 Les définitions `corvus_core_api`, `corvus_host`, `corvus_get_api_fn`, les valeurs de version et les symboles natifs sont **inchangés**. La modification concerne uniquement le chemin d'inclusion au moment de la compilation.
 
-L'en-tête `<corvus/achievements.h>` reste un raccourci pour les anciennes intégrations de l'extension optionnelle ; de nouveaux projets peuvent simplement inclure `<corvusapi.h>`.
+L'ancien `<corvus/achievements.h>` est lui aussi déplacé : utiliser `<achievements.h>` ou simplement `<corvusapi.h>` (qui contient déjà toutes les déclarations). Ce changement du chemin d'inclusion est une rupture de compatibilité source, pas ABI.
 
 ## Dépôts consommateurs
 

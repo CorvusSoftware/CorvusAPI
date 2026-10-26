@@ -17,7 +17,8 @@ une version 1.0.
 
 ## Contrat public
 
-- Header : [`include/corvus/api.h`](include/corvus/api.h)
+- En-tête autonome : [`include/corvusapi.h`](include/corvusapi.h)
+- Chemins historiques conservés : [`corvus/api.h`](include/corvus/api.h) et [`corvus/achievements.h`](include/corvus/achievements.h)
 - Specification du contrat : [`docs/ABI.md`](docs/ABI.md)
 - Langages : ABI C, utilisable depuis le C et le C++
 - Plateformes : pas de dependance Android, Java ou CorvusCore
@@ -31,7 +32,7 @@ Ce depot ne contient ni coeur d'exemple ni implementation de moteur.
 
 ## Utilisation du SDK
 
-Un frontend ou un coeur peut inclure `corvus/api.h` directement et utiliser
+Un frontend ou un coeur peut inclure `corvusapi.h` directement (un seul fichier autonome C11/C++20 contenant le contrat de base et l'extension optionnelle). Les anciens chemins `corvus/api.h` et `corvus/achievements.h` continuent de fonctionner. Il peut utiliser
 la cible CMake d'interface `CorvusAPI::CorvusAPI`. Aucune bibliotheque
 native CorvusAPI n'a besoin d'etre liee : les fonctions sont implementees
 par le module du coeur.
@@ -50,7 +51,7 @@ et celles du frontend utilise.
 
 ## Extension mémoire RetroAchievements
 
-Le contrat optionnel [`corvus/achievements.h`](include/corvus/achievements.h)
+Le contrat optionnel [`corvus/achievements.h`](include/corvus/achievements.h), egalement defini dans [`corvusapi.h`](include/corvusapi.h),
 expose des lectures synchrones et sans effet de bord dans l'espace mémoire de
 RetroAchievements. Il utilise le même handle que l'API de base et un symbole
 indépendant, `corvus_get_achievements_api`. L'ABI0 reste inchangée ; un module

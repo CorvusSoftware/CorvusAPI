@@ -16,6 +16,7 @@ target_include_directories(corvusapi INTERFACE
 )
 
 install(DIRECTORY include/corvus DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES include/corvusapi.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS corvusapi EXPORT CorvusAPITargets)
 install(EXPORT CorvusAPITargets
     NAMESPACE CorvusAPI::

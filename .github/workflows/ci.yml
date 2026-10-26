@@ -21,7 +21,7 @@ jobs:
       - name: Check copyright and license identifiers
         shell: bash
         run: |
-          for header in include/corvus/*.h include/corvusapi.h; do
+          for header in include/*.h; do
             test "$(sed -n '1p' "$header")" = '// CorvusAPI - CorvusSoftware'
             test "$(sed -n '2p' "$header")" = '// Copyright (C) 2026 CorvusSoftware'
             test "$(sed -n '3p' "$header")" = '// SPDX-License-Identifier: MIT'
@@ -29,12 +29,12 @@ jobs:
       - name: Compile public headers independently and in both orders
         run: |
           set -euo pipefail
-          for header in corvusapi.h corvus/achievements.h; do
+          for header in corvusapi.h achievements.h; do
             printf '#include <%s>\n' "$header" | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
             printf '#include <%s>\n' "$header" | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
           done
-          printf '#include <corvusapi.h>\n#include <corvus/achievements.h>\n' | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
-          printf '#include <corvus/achievements.h>\n#include <corvusapi.h>\n' | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
+          printf '#include <corvusapi.h>\n#include <achievements.h>\n' | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
+          printf '#include <achievements.h>\n#include <corvusapi.h>\n' | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
           printf '#include <corvusapi.h>\n' | clang -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
 
   integration:
@@ -63,9 +63,9 @@ jobs:
         run: |
           cmake --install build --config Release --prefix "$RUNNER_TEMP/corvusapi-install"
           test -f "$RUNNER_TEMP/corvusapi-install/include/corvusapi.h"
-          test ! -e "$RUNNER_TEMP/corvusapi-install/include/corvus/api.h"
-          test -f "$RUNNER_TEMP/corvusapi-install/include/corvus/achievements.h"
-          test ! -e include/corvus/api.h
+          test ! -d "$RUNNER_TEMP/corvusapi-install/include/corvus"
+          test -f "$RUNNER_TEMP/corvusapi-install/include/achievements.h"
+          test ! -d include/corvus
       - name: Test standalone downstream find_package consumer
         run: |
           cmake -S tests/package_consumer -B consumer \

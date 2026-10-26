@@ -30,8 +30,8 @@ write_basic_package_version_file(
     COMPATIBILITY ExactVersion
 )
 
-install(DIRECTORY include/corvus DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(FILES include/corvusapi.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES include/corvusapi.h include/achievements.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS corvusapi EXPORT CorvusAPITargets)
 install(EXPORT CorvusAPITargets
     NAMESPACE CorvusAPI::

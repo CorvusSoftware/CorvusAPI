@@ -7,7 +7,7 @@ Décrivez le besoin côté frontend et côté cœur.
 
 - [ ] Les types, symboles, versions et durées de vie publiques restent compatibles ; sinon, j'ai documenté la rupture et sa négociation.
 - [ ] Tous les nouveaux consommateurs incluent `corvusapi.h` ; l'ancien `corvus/api.h` n'est pas réintroduit.
-- [ ] Le raccourci optionnel `corvus/achievements.h` reste utilisable.
+- [ ] Le raccourci optionnel `achievements.h` reste utilisable.
 - [ ] Les exemples et la documentation ont été actualisés si nécessaire.
 - [ ] Aucune dépendance à un frontend ou à un moteur particulier n'a été ajoutée.
 

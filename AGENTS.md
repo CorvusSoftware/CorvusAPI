@@ -6,7 +6,7 @@ Ce dépôt définit **uniquement** l'interface de communication entre frontends 
 
 - `include/corvusapi.h` est **l'en-tête public canonique** de l'ABI C.
 - `include/corvus/api.h` a été supprimé pour éviter la duplication des points d'entrée documentés. Ne pas le recréer ; utiliser exclusivement `<corvusapi.h>` pour le contrat de base.
-- `include/corvus/achievements.h` reste une enveloppe de compatibilité optionnelle pour l'extension mémoire.
+- `include/achievements.h` est un raccourci optionnel vers `corvusapi.h` pour l'extension mémoire ; le répertoire historique `include/corvus/` n'existe plus.
 - `docs/ABI.md` décrit la base ; `docs/ACHIEVEMENTS.md` l'extension mémoire ; `docs/COMPATIBILITY.md` la politique de versionnage.
 - `examples/minimal_core.c` donne un exemple synthétique indépendant ; `tools/corvusapi_verify.c` est un vérificateur, pas un environnement d'exécution sécurisé.
 - Le paquet CMake doit exporter `CorvusAPI::CorvusAPI` aussi bien dans l'arbre source qu'après installation.
@@ -30,6 +30,6 @@ cmake --build build --config Release
 ctest --test-dir build -C Release --output-on-failure
 ```
 
-Valider les inclusions indépendantes `corvusapi.h` et `corvus/achievements.h` sous C11 et C++20, ainsi que l'installation CMake et un consommateur via `find_package`. Ne jamais affirmer qu'un test ou qu'une plateforme a réussi sans avoir consulté son résultat.
+Valider les inclusions indépendantes `corvusapi.h` et `achievements.h` sous C11 et C++20, ainsi que l'installation CMake et un consommateur via `find_package`. Ne jamais affirmer qu'un test ou qu'une plateforme a réussi sans avoir consulté son résultat.
 
 Toute modification fonctionnelle de l'ABI doit mettre à jour les docs, les tests et la checklist de release. Proposer les changements sur une branche/PR, sans fusion directe non sollicitée.

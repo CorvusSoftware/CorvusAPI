@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <corvusapi.h>
-#include <corvus/achievements.h>
+#include <achievements.h>
 
 int main(void) {
     corvus_core_api core = {0};

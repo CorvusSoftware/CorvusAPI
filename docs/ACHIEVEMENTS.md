@@ -6,7 +6,7 @@ The existing CorvusAPI0 ABI has no memory inspection operation. Reading battery
 data or decoding private save-state layouts is not an interchangeable substitute
 for reading the live address space required by RetroAchievements.
 
-`include/corvus/achievements.h` defines a separate optional C entrypoint:
+`include/achievements.h` defines a separate optional C entrypoint:
 `corvus_get_achievements_api(1, out)`. The original header and its structures are
 unchanged. Existing cores and hosts continue to negotiate ABI0 byte-for-byte.
 Hosts must test for the extension symbol. Its absence disables achievements for

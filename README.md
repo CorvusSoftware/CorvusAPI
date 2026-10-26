@@ -10,7 +10,7 @@ CorvusAPI est un protocole d'interopérabilité ; **ce dépôt ne contient ni é
 
 - **En-tête canonique unique :** [`include/corvusapi.h`](include/corvusapi.h), C11 et C++20.
 - **En-tête unique :** utilisez uniquement `<corvusapi.h>` pour l'API de base et les extensions.
-- **Compatibilité ciblée :** `<corvus/achievements.h>` reste disponible comme raccourci pour l'extension mémoire. L'ancien `<corvus/api.h>` a été supprimé : migrez les projets qui l'utilisaient vers `<corvusapi.h>`.
+- **En-têtes à la racine de `include/` :** `<corvusapi.h>` (contrat complet) et `<achievements.h>` (raccourci facultatif pour l'extension mémoire). L'ancien `<corvus/api.h>` a été supprimé : migrez les projets qui l'utilisaient vers `<corvusapi.h>`.
 - **Entrée obligatoire des modules :** `corvus_get_api` (interface C, sans symboles C++ exposés).
 - **Extension facultative :** `corvus_get_achievements_api` pour lire l'espace mémoire des succès.
 - **Licence :** MIT pour cette API ; les cœurs et frontends conservent leurs propres licences.

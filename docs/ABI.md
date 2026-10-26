@@ -13,7 +13,7 @@ Aucune compatibilite binaire entre revisions n'est encore garantie.
 
 ## En-tête autonome
 
-`#include <corvusapi.h>` fournit toutes les déclarations publiques dans un seul fichier C compatible C11 et C++20. Le chemin historique `#include <corvus/api.h>` est retiré : remplacez-le par `#include <corvusapi.h>`. Le raccourci `#include <corvus/achievements.h>` reste disponible pour l'extension mémoire. Aucun type, symbole ou numéro de version de l'ABI n'est changé : l'extension mémoire demeure facultative et négociée séparément.
+`#include <corvusapi.h>` fournit toutes les déclarations publiques dans un seul fichier C compatible C11 et C++20. Le chemin historique `#include <corvus/api.h>` est retiré : remplacez-le par `#include <corvusapi.h>`. Le raccourci `#include <achievements.h>` reste disponible pour l'extension mémoire. Aucun type, symbole ou numéro de version de l'ABI n'est changé : l'extension mémoire demeure facultative et négociée séparément.
 
 ## Decouverte et compatibilite
 

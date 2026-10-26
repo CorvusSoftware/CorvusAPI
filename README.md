@@ -6,11 +6,11 @@ CorvusAPI est un protocole d'interopérabilité ; **ce dépôt ne contient ni é
 
 ## Statut et compatibilité
 
-**ABI de base 0 — expérimentale.** CorvusAPI n'annonce pas encore la stabilité binaire 1.0. Les évolutions incompatibles sont susceptibles de nécessiter une nouvelle version négociée. L'extension facultative de lecture mémoire des succès est versionnée séparément (`CORVUS_ACHIEVEMENTS_API_VERSION = 1`).
+**ABI de base 0 expérimentale.** CorvusAPI n'annonce pas encore la stabilité binaire 1.0. Les évolutions incompatibles sont susceptibles de nécessiter une nouvelle version négociée. L'extension facultative de lecture mémoire des succès est versionnée séparément (`CORVUS_ACHIEVEMENTS_API_VERSION = 1`).
 
 - **En-tête canonique unique :** [`include/corvusapi.h`](include/corvusapi.h), C11 et C++20.
 - **En-tête unique :** utilisez uniquement `<corvusapi.h>` pour l'API de base et les extensions.
-- **En-têtes à la racine de `include/` :** `<corvusapi.h>` (contrat complet) et `<achievements.h>` (raccourci facultatif pour l'extension mémoire). L'ancien `<corvus/api.h>` a été supprimé : migrez les projets qui l'utilisaient vers `<corvusapi.h>`.
+- **En-têtes à la racine de `include/` :** `<corvusapi.h>` (contrat complet) et `<achievements.h>` (raccourci facultatif pour l'extension mémoire).
 - **Entrée obligatoire des modules :** `corvus_get_api` (interface C, sans symboles C++ exposés).
 - **Extension facultative :** `corvus_get_achievements_api` pour lire l'espace mémoire des succès.
 - **Licence :** MIT pour cette API ; les cœurs et frontends conservent leurs propres licences.
@@ -79,4 +79,4 @@ Cette cible **INTERFACE** donne accès aux en-têtes sans bibliothèque à lier.
 
 CorvusAPI sépare le **moteur** (émulation, chargement, états et batterie) du **frontend** (interface utilisateur, fichiers, affichage, audio, contrôleurs et distribution). Elle ne nécessite ni Android, ni JNI, ni réseau, ni code de CorvusCore.
 
-Copyright © 2026 CorvusSoftware — [Licence MIT](LICENSE).
+Copyright © 2026 CorvusSoftware - [Licence MIT](LICENSE).

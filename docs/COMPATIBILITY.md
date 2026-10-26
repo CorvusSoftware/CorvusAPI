@@ -6,7 +6,8 @@
 - **ABI de base :** `CORVUS_API_VERSION == 0`, **expérimentale**.
 - **Extension de lecture mémoire :** version 1, optionnelle et négociée par `corvus_get_achievements_api`.
 - **En-tête canonique :** `<corvusapi.h>`, sans dépendance externe au-delà de la bibliothèque standard C.
-- Les inclusions `<corvus/api.h>` et `<corvus/achievements.h>` sont conservées pour les consommateurs existants.
+- L'ancien chemin `<corvus/api.h>` n'est plus distribué. Tous les consommateurs de l'API de base doivent utiliser `<corvusapi.h>`.
+- Le raccourci `<corvus/achievements.h>` reste présent pour l'extension optionnelle, mais le seul fichier nécessaire est `<corvusapi.h>`.
 
 CorvusAPI ne garantit pas encore une compatibilité binaire entre toutes les révisions du paquet 0.x. Le paquet CMake annonce délibérément une compatibilité de version **exacte** pour éviter qu'un consommateur reçoive implicitement une interface non validée.
 

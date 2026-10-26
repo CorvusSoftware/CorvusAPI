@@ -6,7 +6,8 @@ Merci de contribuer au contrat ouvert de CorvusSoftware. CorvusAPI est une **API
 
 - Ouvrir une issue de proposition pour toute modification de l'ABI, des callbacks, des versions ou des extensions.
 - Expliquer le cas d'usage pour les cœurs **et** les frontends, ainsi que le comportement si la fonctionnalité est absente.
-- Préserver les chemins d'inclusion historiques et le rôle de l'en-tête public `include/corvusapi.h`.
+- Utiliser `include/corvusapi.h` comme en-tête public unique de l'API de base, sans réintroduire `include/corvus/api.h`.
+- Conserver `include/corvus/achievements.h` uniquement comme raccourci historique de l'extension mémoire.
 - Ne pas introduire de dépendance à CorvusCore, CorvusRetro, Android, une bibliothèque externe ou une plateforme spécifique.
 - Maintenir la licence MIT et les attributions des contributions.
 

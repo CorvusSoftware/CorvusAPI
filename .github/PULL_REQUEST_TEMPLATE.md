@@ -6,7 +6,8 @@ Décrivez le besoin côté frontend et côté cœur.
 ## Contrat public et compatibilité
 
 - [ ] Les types, symboles, versions et durées de vie publiques restent compatibles ; sinon, j'ai documenté la rupture et sa négociation.
-- [ ] Les anciens en-têtes `corvus/api.h` et `corvus/achievements.h` restent utilisables.
+- [ ] Tous les nouveaux consommateurs incluent `corvusapi.h` ; l'ancien `corvus/api.h` n'est pas réintroduit.
+- [ ] Le raccourci optionnel `corvus/achievements.h` reste utilisable.
 - [ ] Les exemples et la documentation ont été actualisés si nécessaire.
 - [ ] Aucune dépendance à un frontend ou à un moteur particulier n'a été ajoutée.
 

@@ -9,7 +9,8 @@ CorvusAPI est un protocole d'interopérabilité ; **ce dépôt ne contient ni é
 **ABI de base 0 — expérimentale.** CorvusAPI n'annonce pas encore la stabilité binaire 1.0. Les évolutions incompatibles sont susceptibles de nécessiter une nouvelle version négociée. L'extension facultative de lecture mémoire des succès est versionnée séparément (`CORVUS_ACHIEVEMENTS_API_VERSION = 1`).
 
 - **En-tête canonique unique :** [`include/corvusapi.h`](include/corvusapi.h), C11 et C++20.
-- **Anciennes inclusions maintenues :** `<corvus/api.h>` et `<corvus/achievements.h>`.
+- **En-tête unique :** utilisez uniquement `<corvusapi.h>` pour l'API de base et les extensions.
+- **Compatibilité ciblée :** `<corvus/achievements.h>` reste disponible comme raccourci pour l'extension mémoire. L'ancien `<corvus/api.h>` a été supprimé : migrez les projets qui l'utilisaient vers `<corvusapi.h>`.
 - **Entrée obligatoire des modules :** `corvus_get_api` (interface C, sans symboles C++ exposés).
 - **Extension facultative :** `corvus_get_achievements_api` pour lire l'espace mémoire des succès.
 - **Licence :** MIT pour cette API ; les cœurs et frontends conservent leurs propres licences.

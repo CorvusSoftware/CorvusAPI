@@ -22,7 +22,7 @@ jobs:
       - name: Check copyright and SPDX headers
         shell: bash
         run: |
-          for header in include/corvus/*.h; do
+          for header in include/corvus/*.h include/corvusapi.h; do
             test "$(sed -n '1p' "$header")" = '// CorvusAPI - CorvusSoftware'
             test "$(sed -n '2p' "$header")" = '// Copyright (C) 2026 CorvusSoftware'
             test "$(sed -n '3p' "$header")" = '// SPDX-License-Identifier: MIT'
@@ -31,10 +31,22 @@ jobs:
           test "$(sed -n '3p' CMakeLists.txt)" = '# SPDX-License-Identifier: MIT'
       - name: Validate C11 header
         run: |
-          printf '#include <corvus/api.h>\n#include <corvus/achievements.h>\n' | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
+          for headers in '#include <corvusapi.h>' '#include <corvus/api.h>' '#include <corvus/achievements.h>' '#include <corvus/achievements.h>\n#include <corvus/api.h>\n#include <corvusapi.h>'; do
+            printf '%b\n' "$headers" | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
+          done
       - name: Validate C++20 header
         run: |
-          printf '#include <corvus/api.h>\n#include <corvus/achievements.h>\n' | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
+          for headers in '#include <corvusapi.h>' '#include <corvus/api.h>' '#include <corvus/achievements.h>' '#include <corvus/api.h>\n#include <corvus/achievements.h>\n#include <corvusapi.h>'; do
+            printf '%b\n' "$headers" | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
+          done
+      - name: Validate CMake install
+        run: |
+          cmake -S . -B build-install
+          cmake --install build-install --prefix "$RUNNER_TEMP/corvusapi"
+          test -f "$RUNNER_TEMP/corvusapi/include/corvusapi.h"
+          test -f "$RUNNER_TEMP/corvusapi/include/corvus/api.h"
+          test -f "$RUNNER_TEMP/corvusapi/include/corvus/achievements.h"
+          printf '#include <corvusapi.h>\n' | cc -std=c11 -Wall -Wextra -Werror -pedantic -I"$RUNNER_TEMP/corvusapi/include" -x c -fsyntax-only -
       - name: Configure CMake interface
         run: |
           cmake -S . -B build -DCORVUSAPI_BUILD_VERIFIER=ON

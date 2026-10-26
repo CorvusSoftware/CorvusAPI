@@ -11,6 +11,10 @@ particulier derriere l'ABI C.
 La revision actuelle est experimentale : `CORVUS_API_VERSION == 0`.
 Aucune compatibilite binaire entre revisions n'est encore garantie.
 
+## En-tête autonome
+
+`#include <corvusapi.h>` fournit toutes les déclarations publiques dans un seul fichier C compatible C11 et C++20. Les anciens chemins `#include <corvus/api.h>` et `#include <corvus/achievements.h>` restent compatibles et incluent ce fichier. Aucun type, symbole ou numéro de version de l'ABI n'est changé : l'extension mémoire demeure facultative et négociée séparément.
+
 ## Decouverte et compatibilite
 
 Chaque module expose le symbole C `corvus_get_api`, qui correspond au type

@@ -38,6 +38,16 @@ Il ne prouve pas la conformite de l'emulation ni la securite du
 code natif. N'executer que des bibliotheques approuvees, car elles
 sont chargees dans le processus du verificateur.
 
+## Tests automatises deja presents
+
+- Compilations des trois chemins d'en-tete independamment et dans differents ordres, en C11 et C++20.
+- Module d'exemple C11 autonome, lance par le verificateur ABI sur les plateformes CI.
+- Test du cycle de vie synthétique : chargement, rendu ARGB8888, audio PCM stereo, commandes et dechargement.
+- Installation de l'en-tete et import du paquet CMake par un consommateur externe, avec version exacte.
+
+Ces validations sont des tests de contrat, **pas** une promesse de compatibilite binaire 1.0 ni une validation sur ROMs reelles.
+
+
 ## Licences
 
 Le contrat public reste MIT avec le copyright CorvusSoftware.

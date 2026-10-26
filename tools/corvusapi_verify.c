@@ -4,7 +4,7 @@
 
 /* Standalone ABI verifier for compiled CorvusAPI core modules.
  * Not an emulator and not a sample core. */
-#include <corvus/api.h>
+#include <corvusapi.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>

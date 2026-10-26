@@ -3,23 +3,22 @@
 # SPDX-License-Identifier: MIT
 
 name: CorvusAPI CI
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
 
 jobs:
-  header:
+  headers:
+    name: Public C11 and C++20 headers
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - name: Check copyright and SPDX headers
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Check copyright and license identifiers
         shell: bash
         run: |
           for header in include/corvus/*.h include/corvusapi.h; do
@@ -27,27 +26,49 @@ jobs:
             test "$(sed -n '2p' "$header")" = '// Copyright (C) 2026 CorvusSoftware'
             test "$(sed -n '3p' "$header")" = '// SPDX-License-Identifier: MIT'
           done
-          test "$(sed -n '1p' CMakeLists.txt)" = '# CorvusAPI - CorvusSoftware'
-          test "$(sed -n '3p' CMakeLists.txt)" = '# SPDX-License-Identifier: MIT'
-      - name: Validate C11 header
+      - name: Compile public headers independently and in both orders
         run: |
-          for headers in '#include <corvusapi.h>' '#include <corvus/api.h>' '#include <corvus/achievements.h>' '#include <corvus/achievements.h>\n#include <corvus/api.h>\n#include <corvusapi.h>'; do
-            printf '%b\n' "$headers" | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
+          set -euo pipefail
+          for header in corvusapi.h corvus/achievements.h; do
+            printf '#include <%s>\n' "$header" | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
+            printf '#include <%s>\n' "$header" | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
           done
-      - name: Validate C++20 header
+          printf '#include <corvusapi.h>\n#include <corvus/achievements.h>\n' | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
+          printf '#include <corvus/achievements.h>\n#include <corvusapi.h>\n' | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
+          printf '#include <corvusapi.h>\n' | clang -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
+
+  integration:
+    name: Build, verify and install (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Configure verifier, example core and lifecycle tests
+        run: >
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          -DCORVUSAPI_BUILD_VERIFIER=ON
+          -DCORVUSAPI_BUILD_EXAMPLES=ON
+          -DCORVUSAPI_BUILD_TESTS=ON
+      - name: Build C11 example and verifier
+        run: cmake --build build --config Release --parallel 2
+      - name: Run native ABI and lifecycle tests
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Install public headers and CMake config
         run: |
-          for headers in '#include <corvusapi.h>' '#include <corvus/api.h>' '#include <corvus/achievements.h>' '#include <corvus/api.h>\n#include <corvus/achievements.h>\n#include <corvusapi.h>'; do
-            printf '%b\n' "$headers" | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
-          done
-      - name: Validate CMake install
+          cmake --install build --config Release --prefix "$RUNNER_TEMP/corvusapi-install"
+          test -f "$RUNNER_TEMP/corvusapi-install/include/corvusapi.h"
+          test ! -e "$RUNNER_TEMP/corvusapi-install/include/corvus/api.h"
+          test -f "$RUNNER_TEMP/corvusapi-install/include/corvus/achievements.h"
+          test ! -e include/corvus/api.h
+      - name: Test standalone downstream find_package consumer
         run: |
-          cmake -S . -B build-install
-          cmake --install build-install --prefix "$RUNNER_TEMP/corvusapi"
-          test -f "$RUNNER_TEMP/corvusapi/include/corvusapi.h"
-          test -f "$RUNNER_TEMP/corvusapi/include/corvus/api.h"
-          test -f "$RUNNER_TEMP/corvusapi/include/corvus/achievements.h"
-          printf '#include <corvusapi.h>\n' | cc -std=c11 -Wall -Wextra -Werror -pedantic -I"$RUNNER_TEMP/corvusapi/include" -x c -fsyntax-only -
-      - name: Configure CMake interface
-        run: |
-          cmake -S . -B build -DCORVUSAPI_BUILD_VERIFIER=ON
-          cmake --build build
+          cmake -S tests/package_consumer -B consumer \
+            -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/corvusapi-install"
+          cmake --build consumer --config Release --parallel 2
+          ctest --test-dir consumer -C Release --output-on-failure

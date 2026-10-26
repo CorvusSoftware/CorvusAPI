@@ -1,0 +1,12 @@
+# Build and local CMake state
+/build/
+/build-*/
+/cmake-build-*/
+/CMakeUserPresets.json
+/.cache/
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.exe

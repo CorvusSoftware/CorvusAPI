@@ -8,10 +8,11 @@ CorvusAPI définit le **contrat ABI C public** entre les frontends et les cœurs
 
 ### Organisation actuelle
 
-- `include/corvusapi.h` : **en-tête canonique unique**. Il contient l'ABI de base et les déclarations de l'extension mémoire facultative.
+- `include/corvusapi.h` : **en-tête canonique unique**. Il contient l'ABI de base et les extensions facultatives de mémoire, options et sous-systemes.
 - `include/achievements.h` : simple raccourci qui inclut `<corvusapi.h>`. Il ne doit ni dupliquer les types ni définir une seconde API.
 - **Aucun répertoire `include/corvus/`** : les anciens chemins `<corvus/api.h>` et `<corvus/achievements.h>` ont été retirés. Ne pas les réintroduire.
 - `examples/minimal_core.c` : module C11 synthétique pour démontrer le contrat, sans émulation commerciale.
+- `examples/configurable_core.c` : options et session synthétique à deux contenus ; contrat dans `docs/CONFIGURATION.md`.
 - `tools/corvusapi_verify.c` : outil de vérification des modules natifs ; il charge et exécute du code du module.
 - `tests/` : tests du cycle de vie du module et consommateur du paquet CMake installé.
 - `cmake/` et `CMakeLists.txt` : paquet **INTERFACE** `CorvusAPI::CorvusAPI`, installation des deux en-têtes et fichiers de configuration `find_package`.

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 /* Standalone C11/C++20 public core ABI. Version 0 is experimental.
- * The optional memory extension uses a separate version and exported symbol. */
+ * Optional extensions use separate versions and exported symbols. */
 #ifndef CORVUSAPI_H
 #define CORVUSAPI_H
 
@@ -189,6 +189,129 @@ typedef int (*corvus_get_achievements_api_fn)(uint32_t requested_version,
 CORVUS_API_EXPORT int corvus_get_achievements_api(uint32_t requested_version,
                                                 corvus_achievements_api *out);
 
+#ifdef __cplusplus
+}
+#endif
+
+/* Optional configuration extensions. These never change corvus_core_api. */
+#define CORVUS_OPTIONS_API_VERSION 1u
+#define CORVUS_OPTIONS_ENTRYPOINT "corvus_get_options_api"
+#define CORVUS_OPTION_RESTART_REQUIRED (1u << 0)
+#define CORVUS_SUBSYSTEM_API_VERSION 1u
+#define CORVUS_SUBSYSTEM_ENTRYPOINT "corvus_get_subsystem_api"
+#define CORVUS_SESSION_RESET (1u << 0)
+#define CORVUS_SESSION_STATES (1u << 1)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Immutable module-lifetime metadata. Keys and value IDs are nonempty ASCII
+ * machine tokens [A-Za-z0-9_.-], at most 95 bytes. Labels and descriptions are
+ * UTF-8, at most 255 bytes excluding NUL. At most 64 options/64 values each.
+ * Every option has at least one value and a valid default_index. Keys are unique
+ * per module; value IDs are unique within their option. Metadata, counts and
+ * array shapes do not change during the module lifetime, including selections,
+ * load and unload. Arrays use the native version-1 struct layout/stride. */
+typedef struct corvus_option_value {
+    uint32_t struct_size;
+    const char *id;
+    const char *label;
+} corvus_option_value;
+
+typedef struct corvus_core_option {
+    uint32_t struct_size;
+    const char *key;
+    const char *label;
+    const char *description;
+    uint32_t flags;
+    uint32_t value_count;
+    const corvus_option_value *values;
+    uint32_t default_index;
+} corvus_core_option;
+
+/* Same base create handle; calls serialized on its owner thread between frames.
+ * Metadata is available before content load. count(NULL) returns 0;
+ * describe rejects NULL/unrecognized index/small output
+ * without writing. get_value returns the selected (possibly pending) index, or
+ * UINT32_MAX for NULL/unknown key. set_value rejects invalid input atomically.
+ * Defaults are selected on create. Unflagged selections apply immediately;
+ * RESTART_REQUIRED applies on the next successful load or reset. No setter may
+ * invoke video/audio callbacks. Unload preserves the selected options. */
+typedef struct corvus_options_api {
+    uint32_t struct_size;
+    uint32_t api_version;
+    uint32_t (*count)(void *core);
+    int (*describe)(void *core, uint32_t index, corvus_core_option *out);
+    uint32_t (*get_value)(void *core, const char *key);
+    int (*set_value)(void *core, const char *key, uint32_t value_index);
+} corvus_options_api;
+
+typedef int (*corvus_get_options_api_fn)(uint32_t requested_version,
+                                        corvus_options_api *out);
+CORVUS_API_EXPORT int corvus_get_options_api(uint32_t requested_version,
+                                            corvus_options_api *out);
+
+/* Subsystem IDs use the same token rules as option keys. All strings and arrays
+ * are immutable for the module lifetime. Extensions are pipe-separated suffixes
+ * without dots. IDs are unique per module. Labels/extensions are nonempty UTF-8
+ * strings, at most 255 bytes excluding NUL. Metadata/count are available before
+ * load, fixed for module lifetime; arrays use native version-1 layout/stride.
+ * There are at most 16 subsystems, each with 1..4 players and
+ * 1..4 ordered content slots. required is 0 or 1. */
+typedef struct corvus_subsystem_rom {
+    uint32_t struct_size;
+    const char *label;
+    const char *extensions;
+    uint32_t required;
+} corvus_subsystem_rom;
+
+typedef struct corvus_subsystem_info {
+    uint32_t struct_size;
+    const char *id;
+    const char *label;
+    uint32_t num_players;
+    uint32_t game_count;
+    const corvus_subsystem_rom *games;
+} corvus_subsystem_info;
+
+/* load accepts only a live UNLOADED base handle. count equals game_count;
+ * absent optional slots are zeroed corvus_game with struct_size set. All ROM
+ * and battery bytes retained are copied before returning. Failure leaves the
+ * instance unloaded/reusable; loading an already loaded handle fails unchanged.
+ * No callbacks are emitted by load. Base run_frame, inputs, AV, unload and reset
+ * operate the complete session; the core composes video/audio for all players.
+ * capabilities is 0 unloaded and also describes normal load_game sessions.
+ * RESET/STATES must be intersected with base reset/full state pointer support.
+ * Without STATES, never serialize an individual player of a paired session.
+ * For multiple contents, base battery reports unavailable (size/dirty=0,
+ * copy/acknowledge=0). The per-slot battery group is all present or all NULL,
+ * uses zero-based slots and independent generations, including normal slot 0.
+ * Invalid/unloaded slots return 0 without writing buffers or generation.
+ * Acknowledgement follows durable persistence and cannot clear newer writes.
+ * All instance operations follow the base owner-thread and callback rules. */
+typedef struct corvus_subsystem_api {
+    uint32_t struct_size;
+    uint32_t api_version;
+    uint32_t (*count)(void);
+    int (*describe)(uint32_t index, corvus_subsystem_info *out);
+    int (*load)(void *core, const char *id, const corvus_game *games, size_t count);
+    uint32_t (*capabilities)(void *core);
+    size_t (*battery_size)(void *core, uint32_t slot);
+    int (*battery_dirty)(void *core, uint32_t slot);
+    int (*battery_copy)(void *core, uint32_t slot, uint8_t *output,
+                        size_t capacity, uint64_t *generation);
+    int (*battery_acknowledge)(void *core, uint32_t slot, uint64_t generation);
+} corvus_subsystem_api;
+
+typedef int (*corvus_get_subsystem_api_fn)(uint32_t requested_version,
+                                          corvus_subsystem_api *out);
+CORVUS_API_EXPORT int corvus_get_subsystem_api(uint32_t requested_version,
+                                              corvus_subsystem_api *out);
+
+/* Both negotiations reject NULL, unsupported versions and structures smaller
+ * than the current complete API without writing any output bytes. Success fills
+ * the current structure only. Missing symbols are supported legacy modules. */
 #ifdef __cplusplus
 }
 #endif

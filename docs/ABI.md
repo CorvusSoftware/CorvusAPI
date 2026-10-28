@@ -88,6 +88,17 @@ generation ; le frontend ne confirme cette generation **qu'apres
 l'enregistrement durable**. Les modifications posterieures a la copie
 restent alors marquees comme non enregistrees.
 
+## Extensions facultatives de configuration
+
+Les options de coeur (`corvus_get_options_api`, version 1) et les sessions de
+sous-systeme (`corvus_get_subsystem_api`, version 1) sont negociees separement.
+Leur absence conserve le comportement historique ABI 0. Le contrat normatif de
+[CONFIGURATION.md](CONFIGURATION.md) definit les metadonnees bornees, les options
+immediates ou au prochain reset/chargement, les chargements transactionnels de
+plusieurs contenus, les capacites de session et les generations batterie par
+slot. Les deux extensions utilisent le meme handle opaque que `create`.
+Aucune structure de base ni aucun point d'entree existant n'est modifie.
+
 ## Evolution
 
 Les champs `struct_size` permettent d'etendre les structures.

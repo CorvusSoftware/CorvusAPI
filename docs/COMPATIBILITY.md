@@ -5,6 +5,7 @@
 - **Paquet de distribution :** version 0.1.0 ; une version de paquet n'est pas le numéro de l'ABI.
 - **ABI de base :** `CORVUS_API_VERSION == 0`, **expérimentale**.
 - **Extension de lecture mémoire :** version 1, optionnelle et négociée par `corvus_get_achievements_api`.
+- **Options et sous-systemes :** extensions version 1, facultatives et negociees par `corvus_get_options_api` et `corvus_get_subsystem_api` ; voir [CONFIGURATION.md](CONFIGURATION.md). Les modules historiques restent acceptes.
 - **En-tête canonique :** `<corvusapi.h>`, sans dépendance externe au-delà de la bibliothèque standard C.
 - L'ancien chemin `<corvus/api.h>` n'est plus distribué. Tous les consommateurs de l'API de base doivent utiliser `<corvusapi.h>`.
 - `<achievements.h>` est désormais installé directement à côté de `<corvusapi.h>` ; il inclut ce dernier et n'ajoute aucun second contrat. L'ancien `<corvus/achievements.h>` est supprimé. Pour tout utiliser, `<corvusapi.h>` suffit.

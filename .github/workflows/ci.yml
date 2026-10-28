@@ -33,8 +33,12 @@ jobs:
             printf '#include <%s>\n' "$header" | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
             printf '#include <%s>\n' "$header" | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
           done
-          printf '#include <corvusapi.h>\n#include <achievements.h>\n' | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
-          printf '#include <achievements.h>\n#include <corvusapi.h>\n' | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
+          for first in corvusapi.h achievements.h; do
+            for second in corvusapi.h achievements.h; do
+              printf '#include <%s>\n#include <%s>\n' "$first" "$second" | cc -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
+              printf '#include <%s>\n#include <%s>\n' "$first" "$second" | c++ -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude -x c++ -fsyntax-only -
+            done
+          done
           printf '#include <corvusapi.h>\n' | clang -std=c11 -Wall -Wextra -Werror -pedantic -Iinclude -x c -fsyntax-only -
 
   integration:

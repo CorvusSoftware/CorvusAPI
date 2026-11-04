@@ -81,6 +81,11 @@ if(CORVUSAPI_BUILD_TESTS)
             "CORVUSAPI_BUILD_TESTS needs CORVUSAPI_BUILD_VERIFIER and CORVUSAPI_BUILD_EXAMPLES")
     endif()
     enable_testing()
+    add_executable(corvusapi_cheats_test tests/cheats_test.c examples/configurable_core.c)
+    target_compile_features(corvusapi_cheats_test PRIVATE c_std_11)
+    target_link_libraries(corvusapi_cheats_test PRIVATE CorvusAPI::CorvusAPI)
+    corvusapi_set_warnings(corvusapi_cheats_test)
+    add_test(NAME corvusapi_cheats COMMAND corvusapi_cheats_test)
     add_test(NAME corvusapi_verify_configuration
         COMMAND corvusapi-verify "$<TARGET_FILE:corvusapi_configurable_core>")
     add_executable(corvusapi_configuration_test
@@ -99,7 +104,7 @@ if(CORVUSAPI_BUILD_TESTS)
     corvusapi_set_warnings(corvusapi_lifecycle_test)
     add_test(NAME corvusapi_lifecycle COMMAND corvusapi_lifecycle_test)
 
-    foreach(fixture RANGE 1 3)
+    foreach(fixture RANGE 1 4)
         add_library(corvusapi_invalid_${fixture} SHARED tests/invalid_extensions.c)
         target_compile_features(corvusapi_invalid_${fixture} PRIVATE c_std_11)
         target_compile_definitions(corvusapi_invalid_${fixture} PRIVATE

@@ -14,6 +14,9 @@ typedef struct configurable_instance {
     uint32_t applied_bias;
     uint8_t tone[2], battery[2];
     int pressed[2];
+    uint8_t cheat_value[2];
+    size_t cheat_count[2];
+    const char *error;
     uint64_t generation[2], acknowledged[2], copied[2];
 } configurable_instance;
 
@@ -62,6 +65,7 @@ static int load_contents(configurable_instance *c, const corvus_game *games, siz
         c->tone[i] = games[i].rom_data[0];
         c->battery[i] = games[i].battery_size ? games[i].battery_data[0] : 0;
         c->pressed[i] = 0;
+        c->cheat_count[i] = 0;
         /* Keep generations monotonic across sessions to reject stale acks. */
         ++c->generation[i];
         c->acknowledged[i] = c->generation[i];
@@ -76,7 +80,7 @@ static int load_game(void *core, const corvus_game *game) {
 }
 static void unload(void *core) {
     configurable_instance *c = (configurable_instance *)core;
-    if (c) c->slots = 0;
+    if (c) { c->slots = 0; c->cheat_count[0] = c->cheat_count[1] = 0; }
 }
 static int av(void *core, corvus_av_info *out) {
     configurable_instance *c = (configurable_instance *)core;
@@ -95,6 +99,7 @@ static int frame(void *core) {
     uint32_t pixels[2];
     int16_t samples[1600] = {0};
     for (uint32_t i = 0; i < c->slots; ++i) {
+        if (c->cheat_count[i]) c->tone[i] = c->cheat_value[i];
         uint8_t tone = (uint8_t)(c->tone[i] + c->applied_bias);
         if (c->pressed[i] || c->selected[0]) tone = (uint8_t)(255u - tone);
         pixels[i] = UINT32_C(0xFF000000) | ((uint32_t)tone * UINT32_C(0x010101));
@@ -183,13 +188,63 @@ static int battery_copy(void *core, uint8_t *out, size_t capacity, uint64_t *gen
 static int battery_acknowledge(void *core, uint64_t generation) {
     return battery_size(core) ? slot_acknowledge(core, 0, generation) : 0;
 }
+/* The synthetic native format BYTE=HH replaces the tone byte per frame. */
+static int cheat_reject(configurable_instance *c, const char *error) {
+    if (c) c->error = error;
+    return 0;
+}
+static const char *last_error(void *core) {
+    configurable_instance *c = (configurable_instance *)core;
+    return c ? c->error : NULL;
+}
+static uint32_t cheat_capabilities(void *core, uint32_t player) {
+    configurable_instance *c = (configurable_instance *)core;
+    return c && player < c->slots ? CORVUS_CHEAT_FORMAT_CORE_TEXT : 0;
+}
+static int digit(char value) {
+    if (value >= '0' && value <= '9') return value - '0';
+    if (value >= 'A' && value <= 'F') return value - 'A' + 10;
+    return -1;
+}
+static int cheat_validate(void *core, uint32_t player, const char *code) {
+    configurable_instance *c = (configurable_instance *)core;
+    if (!cheat_capabilities(core, player)) return cheat_reject(c, "Joueur indisponible");
+    if (!code) return cheat_reject(c, "Code absent");
+    size_t size = 0;
+    while (size <= CORVUS_CHEATS_MAX_CODE_BYTES && code[size]) ++size;
+    if (size != 7 || memcmp(code, "BYTE=", 5) || digit(code[5]) < 0 || digit(code[6]) < 0)
+        return cheat_reject(c, "Code attendu : BYTE=HH");
+    c->error = NULL;
+    return 1;
+}
+static int cheat_replace(void *core, uint32_t player, const char *const *codes, size_t count) {
+    configurable_instance *c = (configurable_instance *)core;
+    if (!cheat_capabilities(core, player)) return cheat_reject(c, "Joueur indisponible");
+    if (count > CORVUS_CHEATS_MAX_CODES || (count && !codes)) return cheat_reject(c, "Liste invalide");
+    uint8_t value = 0;
+    for (size_t i = 0; i < count; ++i) {
+        if (!cheat_validate(core, player, codes[i])) return 0;
+        value = (uint8_t)(digit(codes[i][5]) * 16 + digit(codes[i][6]));
+    }
+    c->cheat_count[player] = count;
+    c->cheat_value[player] = value;
+    c->error = NULL;
+    return 1;
+}
+CORVUS_API_EXPORT int corvus_get_cheats_api(uint32_t version, corvus_cheats_api *out) {
+    if (version != CORVUS_CHEATS_API_VERSION || !out || out->struct_size < sizeof(*out)) return 0;
+    const corvus_cheats_api api = {sizeof(api), CORVUS_CHEATS_API_VERSION,
+        cheat_capabilities, cheat_validate, cheat_replace};
+    *out = api;
+    return 1;
+}
 CORVUS_API_EXPORT int corvus_get_api(uint32_t version, corvus_core_api *out) {
     if (version != CORVUS_API_VERSION || !out || out->struct_size < sizeof(*out)) return 0;
     const corvus_core_api api = {
         .struct_size = sizeof(api), .api_version = CORVUS_API_VERSION,
         .get_info = info, .create = create, .destroy = destroy, .load_game = load_game,
         .unload_game = unload, .get_av_info = av, .set_button = button,
-        .run_frame = frame, .reset = reset,
+        .run_frame = frame, .reset = reset, .last_error = last_error,
         .battery_size = battery_size, .battery_dirty = battery_dirty,
         .battery_copy = battery_copy, .battery_acknowledge = battery_acknowledge
     };

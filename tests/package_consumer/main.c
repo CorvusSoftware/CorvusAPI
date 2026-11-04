@@ -6,6 +6,8 @@
 #include <achievements.h>
 
 int main(void) {
+    corvus_cheats_api cheats = {0};
+    cheats.struct_size = sizeof(cheats);
     corvus_core_api core = {0};
     corvus_achievements_api achievements = {0};
     corvus_options_api options = {0};
@@ -14,7 +16,8 @@ int main(void) {
     subsystems.struct_size = sizeof(subsystems);
     core.struct_size = sizeof(core);
     achievements.struct_size = sizeof(achievements);
-    return CORVUS_API_VERSION != 0u ||
+    return CORVUS_CHEATS_API_VERSION != 1u || cheats.struct_size != sizeof(corvus_cheats_api) ||
+           CORVUS_API_VERSION != 0u ||
            CORVUS_ACHIEVEMENTS_API_VERSION != 1u ||
            CORVUS_OPTIONS_API_VERSION != 1u || CORVUS_SUBSYSTEM_API_VERSION != 1u ||
            options.struct_size != sizeof(corvus_options_api) ||

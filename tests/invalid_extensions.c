@@ -52,4 +52,11 @@ CORVUS_API_EXPORT int corvus_get_options_api(uint32_t version, corvus_options_ap
     *out = api;
     return 1;
 }
+#elif CORVUS_INVALID_FIXTURE == 4
+CORVUS_API_EXPORT int corvus_get_cheats_api(uint32_t version, corvus_cheats_api *out) {
+    if (version != CORVUS_CHEATS_API_VERSION || !out || out->struct_size < sizeof(*out)) return 0;
+    const corvus_cheats_api api = {.struct_size=sizeof(api), .api_version=CORVUS_CHEATS_API_VERSION};
+    *out = api; /* Deliberately missing every required function. */
+    return 1;
+}
 #endif

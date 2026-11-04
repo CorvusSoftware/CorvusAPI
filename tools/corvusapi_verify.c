@@ -62,6 +62,28 @@ static int token(const char *s) {
     if ((entry)((version), NULL)) return "optional extension accepts NULL output"; \
 } while (0)
 
+static const char *inspect_cheats(module_handle module, void *instance) {
+    void *symbol = lookup_symbol(module, CORVUS_CHEATS_ENTRYPOINT);
+    if (!symbol) { puts("Cheats: absent (legacy module supported)"); return NULL; }
+    corvus_get_cheats_api_fn entry = NULL;
+    memcpy(&entry, &symbol, sizeof(entry));
+    CHECK_NEGOTIATION(entry, corvus_cheats_api, CORVUS_CHEATS_API_VERSION);
+    struct { corvus_cheats_api api; uint64_t guard; } output = {{0}, UINT64_C(0x123456789)};
+    output.api.struct_size = sizeof(output);
+    if (!entry(CORVUS_CHEATS_API_VERSION, &output.api) ||
+        output.guard != UINT64_C(0x123456789) || output.api.struct_size != sizeof(output.api) ||
+        output.api.api_version != CORVUS_CHEATS_API_VERSION)
+        return "invalid cheats negotiation";
+    corvus_cheats_api *api = &output.api;
+    if (!api->capabilities || !api->validate || !api->replace) return "incomplete cheats API";
+    if (api->capabilities(instance, 0) || api->capabilities(NULL, 0) ||
+        api->validate(instance, 0, "invalid") || api->validate(NULL, 0, "invalid") ||
+        api->replace(instance, 0, NULL, 0) || api->replace(NULL, 0, NULL, 0))
+        return "unloaded cheats operation accepted";
+    puts("Cheats: native format extension present");
+    return NULL;
+}
+
 static const char *inspect_options(module_handle module, void *instance) {
     void *symbol = lookup_symbol(module, CORVUS_OPTIONS_ENTRYPOINT);
     if (!symbol) { puts("Options: absent (legacy module supported)"); return NULL; }
@@ -221,6 +243,7 @@ int main(int argc, char **argv) {
     if (!instance) return fail(module, "cannot create core without game");
     const char *extension_error = inspect_options(module, instance);
     if (!extension_error) extension_error = inspect_subsystems(module, instance);
+    if (!extension_error) extension_error = inspect_cheats(module, instance);
     api->destroy(instance);
     if (extension_error) return fail(module, extension_error);
     printf("PASS CorvusAPI %u: %s (%s), system=%s, formats=%s, state=%s, battery=%s\n",

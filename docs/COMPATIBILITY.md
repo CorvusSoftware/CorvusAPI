@@ -21,7 +21,7 @@ CorvusAPI ne garantit pas encore une compatibilité binaire entre toutes les ré
 5. Ne jamais faire traverser cette frontière à un handle privé de moteur, un type C++, un objet Android, un allocateur privé ou une dépendance à un frontend spécifique.
 6. Maintenir la documentation, les exemples, les tests C11/C++20 et les consommateurs historiques avec toute évolution.
 
-Les capacités telles que link cable, triche, capteurs ou vibration ne sont **pas** promises par l'ABI de base actuelle. Elles nécessiteront des extensions définies dans le contrat public avant d'être annoncées comme universelles.
+Les capacités telles que link cable, triche, capteurs ou vibration ne sont **pas** promises par l'ABI de base actuelle. Les sessions de sous-système et les triches natives ont des extensions publiques facultatives séparées ; leur absence reste supportée. Les autres capacités nécessiteront leur propre contrat avant d'être annoncées comme universelles.
 
 ## Rôles et licences
 

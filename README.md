@@ -14,6 +14,7 @@ CorvusAPI est un protocole d'interopérabilité ; **ce dépôt ne contient ni é
 - **Entrée obligatoire des modules :** `corvus_get_api` (interface C, sans symboles C++ exposés).
 - **Extensions de configuration facultatives :** `corvus_get_options_api` et `corvus_get_subsystem_api`, version 1, sans modifier ABI 0.
 - **Extension facultative :** `corvus_get_achievements_api` pour lire l'espace mémoire des succès.
+- **Triches natives facultatives :** `corvus_get_cheats_api`, remplacement atomique par joueur, version 1.
 - **Licence :** MIT pour cette API ; les cœurs et frontends conservent leurs propres licences.
 
 ## Démarrage rapide
@@ -77,6 +78,7 @@ Cette cible **INTERFACE** donne accès aux en-têtes sans bibliothèque à lier.
 - [Contrat ABI, appels et durée de vie](docs/ABI.md)
 - [Politique de compatibilité et extensions](docs/COMPATIBILITY.md)
 - [Options et sessions de sous-systeme](docs/CONFIGURATION.md)
+- [Codes de triche natifs](docs/CHEATS.md)
 - [Extension mémoire de succès](docs/ACHIEVEMENTS.md)
 - [Critères de stabilisation 1.0](docs/RELEASE-CHECKLIST.md)
 - [Contribuer](CONTRIBUTING.md) · [Signaler une vulnérabilité](SECURITY.md)

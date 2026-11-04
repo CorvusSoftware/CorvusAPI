@@ -114,3 +114,9 @@ n'impose pas aux auteurs des coeurs tiers de choisir la MIT. En
 revanche, l'integration et la redistribution avec un frontend ou
 des bibliotheques sous d'autres licences exigent de respecter
 l'ensemble des obligations applicables.
+
+## Native cheat extension
+
+The optional `corvus_get_cheats_api` negotiates version1 without altering ABI0.
+[CHEATS.md](CHEATS.md) defines loaded-slot capabilities, pure validation and atomic
+replacement of active native-code lists. Missing extension preserves legacy use.

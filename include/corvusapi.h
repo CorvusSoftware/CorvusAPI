@@ -312,6 +312,52 @@ CORVUS_API_EXPORT int corvus_get_subsystem_api(uint32_t requested_version,
 /* Both negotiations reject NULL, unsupported versions and structures smaller
  * than the current complete API without writing any output bytes. Success fills
  * the current structure only. Missing symbols are supported legacy modules. */
+/* Optional native-code cheats, independent of ABI 0. See docs/CHEATS.md.
+ * capabilities is a format-family hint for a loaded zero-based player slot;
+ * validate is authoritative for the accepted subset. All calls use the base
+ * owner thread, between frames, and emit no AV callbacks. */
+#define CORVUS_CHEATS_API_VERSION 1u
+#define CORVUS_CHEATS_ENTRYPOINT "corvus_get_cheats_api"
+#define CORVUS_CHEATS_MAX_CODES 128u
+#define CORVUS_CHEATS_MAX_CODE_BYTES 4096u
+
+enum corvus_cheat_capability {
+    CORVUS_CHEAT_FORMAT_GB_GAME_GENIE = 1u << 0,
+    CORVUS_CHEAT_FORMAT_GB_GAME_SHARK = 1u << 1,
+    CORVUS_CHEAT_FORMAT_GBA_CODEBREAKER_RAW = 1u << 2,
+    CORVUS_CHEAT_FORMAT_GBA_GAMESHARK_V1_V2 = 1u << 3,
+    CORVUS_CHEAT_FORMAT_GBA_ACTION_REPLAY_V3 = 1u << 4,
+    CORVUS_CHEAT_FORMAT_CORE_TEXT = 1u << 5
+};
+
+/* Codes are nonempty NUL-terminated UTF-8 strings, each at most
+ * CORVUS_CHEATS_MAX_CODE_BYTES bytes excluding NUL. Names and enabled flags
+ * remain host-owned. validate never changes emulated state or active codes.
+ * replace installs only active entries, preserving their order, from the next
+ * frame. It borrows and copies/decodes all inputs before returning. count <=
+ * CORVUS_CHEATS_MAX_CODES; codes may be NULL only when count == 0, which clears
+ * this slot. Any rejection leaves the previous list and machine unchanged.
+ * Invalid/NULL/unloaded instances and unavailable slots fail; capabilities
+ * returns 0. Failures may update base last_error. Clearing stops future cheat
+ * effects; it does not undo memory changes already made. Lists survive reset
+ * and state restoration, are not serialized, and are cleared by unload/new load.
+ * There is no transaction across slots. An absent extension is a legacy core.
+ * Negotiation follows the optional version-1 rules: reject unknown version,
+ * NULL or small output without writing; fill only the current structure. */
+typedef struct corvus_cheats_api {
+    uint32_t struct_size;
+    uint32_t api_version;
+    uint32_t (*capabilities)(void *core, uint32_t player);
+    int (*validate)(void *core, uint32_t player, const char *code);
+    int (*replace)(void *core, uint32_t player,
+                   const char *const *codes, size_t count);
+} corvus_cheats_api;
+
+typedef int (*corvus_get_cheats_api_fn)(uint32_t requested_version,
+                                       corvus_cheats_api *out);
+CORVUS_API_EXPORT int corvus_get_cheats_api(uint32_t requested_version,
+                                           corvus_cheats_api *out);
+
 #ifdef __cplusplus
 }
 #endif
